@@ -7,7 +7,7 @@ import MapboxNavigationNative
  
  Use this class instead `Directions` requests wrapper to request new routes or refresh an existing one. Depending on `RouterSource`, `NavigationRouter` will use online and/or onboard routing engines. This may be used when designing purely online or offline apps, or when you need to provide best possible service regardless of internet collection.
  */
-public class NavigationRouter {
+public class NavigationRouter: NavigationProvider {
     /**
      Unique identifier for a giver request.
      
@@ -20,7 +20,7 @@ public class NavigationRouter {
      
      You can use this instance to cancel ongoing task if needed. Retaining this handler will keep related `NavigationRouter` from deallocating.
      */
-    public struct RoutingRequest {
+    public struct RoutingRequest: NavigationProviderRequest {
         /**
          Related request identifier.
          */
@@ -33,7 +33,7 @@ public class NavigationRouter {
          Cancels the request if it is still active.
          */
         public func cancel() {
-            router.finish(request: id)
+            router.router.cancelRequest(forToken: id)
         }
     }
     
@@ -72,7 +72,7 @@ public class NavigationRouter {
         }
     }
     
-    static var __testRoutesStub: ((_: RouteOptions, _: @escaping Directions.RouteCompletionHandler) -> RequestId)? = nil
+    static var __testRoutesStub: ((_: RouteOptions, _: @escaping Directions.RouteCompletionHandler) -> RoutingRequest?)? = nil
     
     // MARK: - Properties
     /**
@@ -120,10 +120,10 @@ public class NavigationRouter {
      
      - parameter options: A `RouteOptions` object specifying the requirements for the resulting routes.
      - parameter completionHandler: The closure (block) to call with the resulting routes. This closure is executed on the application’s main thread.
-     - returns: Related request identifier. If, while waiting for the completion handler to execute, you no longer want the resulting routes, cancel corresponding task using `activeRequests`.
+     - returns: Related request. If, while waiting for the completion handler to execute, you no longer want the resulting routes, cancel corresponding task using this handle or `activeRequests`.
      */
     @discardableResult public func requestRoutes(options: RouteOptions,
-                                                 completionHandler: @escaping Directions.RouteCompletionHandler) -> RequestId {
+                                                 completionHandler: @escaping Directions.RouteCompletionHandler) -> NavigationProviderRequest? {
         return Self.__testRoutesStub?(options, completionHandler) ??
             doRequest(options: options) { [weak self] (result: Result<RouteResponse, DirectionsError>) in
                 guard let self = self else { return }
@@ -140,10 +140,10 @@ public class NavigationRouter {
      
      - parameter options: A `MatchOptions` object specifying the requirements for the resulting matches.
      - parameter completionHandler: The closure (block) to call with the resulting matches. This closure is executed on the application’s main thread.
-     - returns: Related request identifier. If, while waiting for the completion handler to execute, you no longer want the resulting routes, cancel corresponding task using `activeRequests`.
+     - returns: Related request. If, while waiting for the completion handler to execute, you no longer want the resulting routes, cancel corresponding task using this handle or `activeRequests`.
      */
     @discardableResult public func requestRoutes(options: MatchOptions,
-                                                 completionHandler: @escaping Directions.MatchCompletionHandler) -> RequestId {
+                                                 completionHandler: @escaping Directions.MatchCompletionHandler) -> NavigationProviderRequest? {
         return doRequest(options: options) { (result: Result<MapMatchingResponse, DirectionsError>) in
             let session = (options: options as DirectionsOptions,
                            credentials: self.settings.directions.credentials)
@@ -161,14 +161,23 @@ public class NavigationRouter {
      - parameter indexedRouteResponse: The `RouteResponse` and selected `routeIndex` in it to be refreshed.
      - parameter fromLegAtIndex: The index of the leg in the route at which to begin refreshing. The response will omit any leg before this index and refresh any leg from this index to the end of the route. If this argument is omitted, the entire route is refreshed.
      - parameter completionHandler: The closure (block) to call with updated `RouteResponse` data. Order of `routes` remain unchanged comparing to original `indexedRouteResponse`. This closure is executed on the application’s main thread.
-     - returns: Related request identifier. If, while waiting for the completion handler to execute, you no longer want the resulting routes, cancel corresponding task using `activeRequests`.
+     - returns: Related request. If, while waiting for the completion handler to execute, you no longer want the resulting routes, cancel corresponding task using this handle or `activeRequests`.
      */
     @discardableResult public func refreshRoute(indexedRouteResponse: IndexedRouteResponse,
                                                 fromLegAtIndex startLegIndex: UInt32 = 0,
-                                                completionHandler: @escaping Directions.RouteCompletionHandler) -> RequestId {
-        guard case let .route(routeOptions) = indexedRouteResponse.routeResponse.options,
-              let responseIdentifier = indexedRouteResponse.routeResponse.identifier else {
+                                                completionHandler: @escaping Directions.RouteCompletionHandler) -> NavigationProviderRequest? {
+        guard case let .route(routeOptions) = indexedRouteResponse.routeResponse.options else {
             preconditionFailure("Invalid route data passed for refreshing.")
+        }
+        
+        let session = (options: routeOptions as DirectionsOptions,
+                       credentials: self.settings.directions.credentials)
+        
+        guard let responseIdentifier = indexedRouteResponse.routeResponse.identifier else {
+            defer {
+                completionHandler(session, .failure(.noData))
+            }
+            return nil
         }
         
         let encoder = JSONEncoder()
@@ -195,32 +204,26 @@ public class NavigationRouter {
                                userInfo: [.options: routeOptions,
                                           .credentials: self.settings.directions.credentials],
                                result: result) { (response: Result<RouteResponse, DirectionsError>) in
-                let session = (options: routeOptions as DirectionsOptions,
-                               credentials: self.settings.directions.credentials)
                 completionHandler(session, response)
             }
         }
-        activeRequests[requestId] = .init(id: requestId,
-                                          router: self)
+        activeRequests[requestId] = RoutingRequest(id: requestId,
+                                                   router: self)
         requestsLock.unlock()
-        return requestId
+        return activeRequests[requestId]
     }
     
     // MARK: - Private methods
     
-    fileprivate func finish(request id: RequestId) {
-        requestsLock.lock(); defer {
-            requestsLock.unlock()
-        }
-        
-        router.cancelRequest(forToken: id)
-        activeRequests[id] = nil
-    }
-    
     fileprivate func complete(requestId: RequestId, with result: @escaping () -> Void) {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [self] in
             result()
-            self.finish(request: requestId)
+            
+            requestsLock.lock(); defer {
+                requestsLock.unlock()
+            }
+            
+            activeRequests[requestId] = nil
         }
     }
 
@@ -285,8 +288,8 @@ public class NavigationRouter {
     }
     
     fileprivate func doRequest<ResponseType: Codable>(options: DirectionsOptions,
-                                                      completion: @escaping (Result<ResponseType, DirectionsError>) -> Void) -> RequestId {
-        let directionsUri = settings.directions.url(forCalculating: options).absoluteString
+                                                      completion: @escaping (Result<ResponseType, DirectionsError>) -> Void) -> RoutingRequest? {
+        let directionsUri = settings.directions.url(forCalculating: options).removingSKU().absoluteString
         var requestId: RequestId!
         requestsLock.lock()
         requestId = router.getRouteForDirectionsUri(directionsUri) { [weak self] (result, _) in
@@ -298,15 +301,37 @@ public class NavigationRouter {
                                           result: result,
                                           completion: completion)
         }
-        activeRequests[requestId] = .init(id: requestId,
-                                          router: self)
+        activeRequests[requestId] = RoutingRequest(id: requestId,
+                                                   router: self)
         requestsLock.unlock()
-        return requestId
+        return activeRequests[requestId]
     }
 }
 
 extension DirectionsProfileIdentifier {
     var nativeProfile: RoutingProfile {
-        return RoutingProfile(profile: rawValue)
+        var mode: RoutingMode
+        switch self {
+        case .automobile:
+            mode = .driving
+        case .automobileAvoidingTraffic:
+            mode = .drivingTraffic
+        case .cycling:
+            mode = .cycling
+        case .walking:
+            mode = .walking
+        default:
+            mode = .driving
+        }
+        return RoutingProfile(mode: mode, account: "mapbox")
+    }
+}
+
+extension URL {
+    func removingSKU() -> URL {
+        var urlComponents = URLComponents(string: self.absoluteString)!
+        let filteredItems = urlComponents.queryItems?.filter { $0.name != "sku" }
+        urlComponents.queryItems = filteredItems
+        return urlComponents.url!
     }
 }

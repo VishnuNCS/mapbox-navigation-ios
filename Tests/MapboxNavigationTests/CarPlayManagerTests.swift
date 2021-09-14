@@ -273,7 +273,7 @@ class CarPlayManagerSpec: QuickSpec {
                 NavigationRouter.__testRoutesStub = { (options, completionHandler) in
                     completionHandler(Directions.Session(options, Fixture.credentials),
                                       .success(fasterResponse))
-                    return 0
+                    return nil
                 }
                 
                 manager!.previewRoutes(for: options, completionHandler: {})

@@ -89,7 +89,7 @@ open class NavigationViewController: UIViewController, NavigationStatusPresenter
     public var voiceController: RouteVoiceController!
     
     func setupVoiceController() {
-        let credentials = navigationService.directions.credentials
+        let credentials = navigationService.credentials
         voiceController = navigationOptions?.voiceController
             ?? RouteVoiceController(navigationService: navigationService,
                                     accessToken: credentials.accessToken,
@@ -181,13 +181,6 @@ open class NavigationViewController: UIViewController, NavigationStatusPresenter
     
     var _routeIndex: Int?
     var _routeResponse: RouteResponse?
-    
-    /**
-     An instance of `Directions` need for rerouting. See [Mapbox Directions](https://docs.mapbox.com/ios/api/directions/) for further information.
-     */
-    public var directions: Directions {
-        return navigationService.directions
-    }
     
     /**
      The navigation service that coordinates the view controller’s nonvisual components, tracking the user’s location as they proceed along the route.

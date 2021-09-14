@@ -18,9 +18,9 @@ open class LegacyRouteController: NSObject, Router, InternalRouter, CLLocationMa
     public unowned var dataSource: RouterDataSource
     
     /**
-     Routing source type used to create the route.
+     Routing provider used to create the route.
      */
-    public var routingSource: NavigationRouter.RouterSource
+    public var routingProvider: NavigationProvider
 
     public var route: Route {
         routeProgress.route
@@ -102,7 +102,7 @@ open class LegacyRouteController: NSObject, Router, InternalRouter, CLLocationMa
     
     var didFindFasterRoute = false
     
-    var routeTask: NavigationRouter.RoutingRequest?
+    var routeTask: NavigationProviderRequest?
     
     
     // MARK: Navigating
@@ -131,7 +131,7 @@ open class LegacyRouteController: NSObject, Router, InternalRouter, CLLocationMa
                      routeOptions: RouteOptions?,
                      isProactive: Bool,
                      completion: ((Bool) -> Void)?) {
-        guard let routes = indexedRouteResponse.routeResponse.routes, routes.count > indexedRouteResponse.routeIndex else {
+        guard let route = indexedRouteResponse.selectedRoute else {
             preconditionFailure("`indexedRouteResponse` does not contain route for index `\(indexedRouteResponse.routeIndex)` when updating route.")
         }
         let routeOptions = routeOptions ?? routeProgress.routeOptions
@@ -195,8 +195,12 @@ open class LegacyRouteController: NSObject, Router, InternalRouter, CLLocationMa
         return false
     }
     
-    required public init(alongRouteAtIndex routeIndex: Int, in routeResponse: RouteResponse, options: RouteOptions, routingSource: NavigationRouter.RouterSource = .hybrid, dataSource source: RouterDataSource) {
-        self.routingSource = routingSource
+    required public init(alongRouteAtIndex routeIndex: Int,
+                         in routeResponse: RouteResponse,
+                         options: RouteOptions,
+                         routingProvider: NavigationProvider = Directions.shared,
+                         dataSource source: RouterDataSource) {
+        self.routingProvider = routingProvider
         self.indexedRouteResponse = .init(routeResponse: routeResponse, routeIndex: routeIndex)
         self.routeProgress = RouteProgress(route: routeResponse.routes![routeIndex], options: options)
         self.dataSource = source

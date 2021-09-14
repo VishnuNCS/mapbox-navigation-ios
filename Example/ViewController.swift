@@ -561,7 +561,11 @@ class ViewController: UIViewController {
     func navigationService(response: RouteResponse, routeIndex: Int, options: RouteOptions) -> NavigationService {
         let mode: SimulationMode = simulationButton.isSelected ? .always : .inTunnels
         
-        return MapboxNavigationService(routeResponse: response, routeIndex: routeIndex, routeOptions: options, simulating: mode)
+        return MapboxNavigationService(routeResponse: response,
+                                       routeIndex: routeIndex,
+                                       routeOptions: options,
+                                       routingProvider: NavigationRouter(.hybrid),
+                                       simulating: mode)
     }
     
     // MARK: - Utility methods

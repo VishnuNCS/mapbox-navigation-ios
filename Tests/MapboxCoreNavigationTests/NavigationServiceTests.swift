@@ -27,7 +27,7 @@ class NavigationServiceTests: TestCase {
         let navigationService = MapboxNavigationService(routeResponse: initialRouteResponse,
                                                         routeIndex: 0,
                                                         routeOptions: routeOptions,
-                                                        routingSource: .offline,
+                                                        routingProvider: NavigationRouter(.offline),
                                                         locationSource: locationSource,
                                                         eventsManagerType: NavigationEventsManagerSpy.self,
                                                         simulating: .never)
@@ -482,7 +482,7 @@ class NavigationServiceTests: TestCase {
                                                      waypoints: nil,
                                                      options: .route(options),
                                                      credentials: Fixture.credentials)))
-            return 0
+            return nil
         }
         
         dependencies.navigationService.start()
@@ -610,7 +610,7 @@ class NavigationServiceTests: TestCase {
 
         autoreleasepool {
             let fakeDataSource = RouteControllerDataSourceFake()
-            let routeController = RouteController(alongRouteAtIndex: 0, in: initialRouteResponse, options: routeOptions, dataSource: fakeDataSource)
+            let routeController = RouteController(alongRouteAtIndex: 0, in: initialRouteResponse, options: routeOptions, routingProvider: NavigationRouter(.offline), dataSource: fakeDataSource)
             subject = routeController
         }
 
@@ -622,7 +622,7 @@ class NavigationServiceTests: TestCase {
 
         autoreleasepool {
             let fakeDataSource = RouteControllerDataSourceFake()
-            _ = RouteController(alongRouteAtIndex: 0, in: initialRouteResponse, options: routeOptions, dataSource: fakeDataSource)
+            _ = RouteController(alongRouteAtIndex: 0, in: initialRouteResponse, options: routeOptions, routingProvider: NavigationRouter(.offline), dataSource: fakeDataSource)
             subject = fakeDataSource
         }
 
@@ -630,7 +630,7 @@ class NavigationServiceTests: TestCase {
     }
 
     func testCountdownTimerDefaultAndUpdate() {
-        let subject = MapboxNavigationService(routeResponse: initialRouteResponse, routeIndex: 0, routeOptions: routeOptions, routingSource: .offline)
+        let subject = MapboxNavigationService(routeResponse: initialRouteResponse, routeIndex: 0, routeOptions: routeOptions, routingProvider: NavigationRouter(.offline))
 
         XCTAssert(subject.poorGPSTimer.countdownInterval == .milliseconds(2500), "Default countdown interval should be 2500 milliseconds.")
 
@@ -658,7 +658,8 @@ class NavigationServiceTests: TestCase {
         routeController.refreshesRoute = false
 
         let routeUpdated = expectation(description: "Route Updated")
-        routeController.updateRoute(with: .init(routeResponse: routeResponse, routeIndex: 0), routeOptions: nil) {
+        routeController.updateRoute(with: .init(routeResponse: routeResponse, routeIndex: 0),
+                                    routeOptions: routeOptions) {
             success in
             XCTAssertTrue(success)
             routeUpdated.fulfill()
@@ -708,7 +709,7 @@ class NavigationServiceTests: TestCase {
         let service = MapboxNavigationService(routeResponse: routeResponse,
                                               routeIndex: 0,
                                               routeOptions: options,
-                                              routingSource: .offline,
+                                              routingProvider: NavigationRouter(.offline),
                                               locationSource: locationManager)
         service.delegate = delegate
         let router = service.router
@@ -735,7 +736,7 @@ class NavigationServiceTests: TestCase {
         NavigationRouter.__testRoutesStub = { (options, completionHandler) in
             completionHandler(Directions.Session(options, Fixture.credentials),
                               .success(fasterResponse))
-            return 0
+            return nil
         }
         
         let rerouteTriggeredExpectation = expectation(description: "Proactive reroute triggered")

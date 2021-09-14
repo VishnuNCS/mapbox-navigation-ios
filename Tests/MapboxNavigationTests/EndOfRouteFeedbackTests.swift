@@ -16,7 +16,6 @@ final class EndOfRouteFeedbackTests: TestCase {
         let service = MapboxNavigationService(routeResponse: route.response,
                                               routeIndex: 0,
                                               routeOptions: options,
-                                              directions: .mocked,
                                               locationSource: nil,
                                               eventsManagerType: nil,
                                               simulating: .never,
