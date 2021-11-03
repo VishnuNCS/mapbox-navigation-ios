@@ -52,6 +52,8 @@
 		2B81EC28241A237E00145086 /* SpeechSynthesizersControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B81EC27241A237E00145086 /* SpeechSynthesizersControllerTests.swift */; };
 		2B871272263966F0001082A9 /* TileStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B8712682639631C001082A9 /* TileStoreConfiguration.swift */; };
 		2B91C9B12416357700E532A5 /* MapboxSpeechSynthesizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B91C9B02416357700E532A5 /* MapboxSpeechSynthesizer.swift */; };
+		2B9F389E2732CECA001DBA12 /* NavigationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B9F389D2732CECA001DBA12 /* NavigationProvider.swift */; };
+		2B9F38A02732CEE4001DBA12 /* Directions+NavigationProviderRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B9F389F2732CEE4001DBA12 /* Directions+NavigationProviderRequest.swift */; };
 		2BBED92F265E2C7D00F90032 /* NativeHandlersFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BBED92E265E2C7D00F90032 /* NativeHandlersFactory.swift */; };
 		2BBED93B267A3AB900F90032 /* BillingHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BBED93A267A3AB900F90032 /* BillingHandler.swift */; };
 		2BBEEDA52508DB1700C8DA4A /* RouteLegProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BBEEDA42508DB1700C8DA4A /* RouteLegProgress.swift */; };
@@ -554,6 +556,8 @@
 		2B81EC27241A237E00145086 /* SpeechSynthesizersControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSynthesizersControllerTests.swift; sourceTree = "<group>"; };
 		2B8712682639631C001082A9 /* TileStoreConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileStoreConfiguration.swift; sourceTree = "<group>"; };
 		2B91C9B02416357700E532A5 /* MapboxSpeechSynthesizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapboxSpeechSynthesizer.swift; sourceTree = "<group>"; };
+		2B9F389D2732CECA001DBA12 /* NavigationProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NavigationProvider.swift; sourceTree = "<group>"; };
+		2B9F389F2732CEE4001DBA12 /* Directions+NavigationProviderRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Directions+NavigationProviderRequest.swift"; sourceTree = "<group>"; };
 		2BBED92E265E2C7D00F90032 /* NativeHandlersFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NativeHandlersFactory.swift; sourceTree = "<group>"; };
 		2BBED93A267A3AB900F90032 /* BillingHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingHandler.swift; sourceTree = "<group>"; };
 		2BBEEDA42508DB1700C8DA4A /* RouteLegProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteLegProgress.swift; sourceTree = "<group>"; };
@@ -1803,6 +1807,7 @@
 				2BBED93A267A3AB900F90032 /* BillingHandler.swift */,
 				C58D6BAC1DDCF2AE00387F53 /* CoreConstants.swift */,
 				2B2C8DBB26E7589F002CCF08 /* CacheHandlerFactory.swift */,
+				2B9F389F2732CEE4001DBA12 /* Directions+NavigationProviderRequest.swift */,
 				351BEC0B1E5BCC72006FE110 /* DistanceFormatter.swift */,
 				B417913A2624F9EA001E0348 /* MBXInfo.plist */,
 				C5ADFBCD1DDCC7840011824B /* Info.plist */,
@@ -1815,6 +1820,7 @@
 				35375EC01F31FA86004CE727 /* NavigationSettings.swift */,
 				351174F31EF1C0530065E248 /* ReplayLocationManager.swift */,
 				C5ADFBF91DDCC9580011824B /* LegacyRouteController.swift */,
+				2B9F389D2732CECA001DBA12 /* NavigationProvider.swift */,
 				8D2AA744211CDD4000EB7F72 /* NavigationService.swift */,
 				8D4CF9C521349FFB009C3FEE /* NavigationServiceDelegate.swift */,
 				4303A3982332CD6200B5737D /* UnimplementedLogging.swift */,
@@ -2709,6 +2715,7 @@
 				3A163AE3249901D000D66A0D /* FixLocation.swift in Sources */,
 				2E50E0D2264E468B009D3848 /* RoadObjectMatcherError.swift in Sources */,
 				8D2AA745211CDD4000EB7F72 /* NavigationService.swift in Sources */,
+				2B9F38A02732CEE4001DBA12 /* Directions+NavigationProviderRequest.swift in Sources */,
 				2B7ACA9C25E3F84700B0ACFD /* PredictiveCacheOptions.swift in Sources */,
 				35A5413B1EFC052700E49846 /* RouteOptions.swift in Sources */,
 				DA5F44F525F07D3B00F573EC /* RoadObjectStoreDelegate.swift in Sources */,
@@ -2717,6 +2724,7 @@
 				DA5F44AC25F07A6800F573EC /* RoadGraphPosition.swift in Sources */,
 				2E50E0E6264E49EF009D3848 /* OpenLRIdentifier.swift in Sources */,
 				353E69041EF0C4E5007B2AE5 /* SimulatedLocationManager.swift in Sources */,
+				2B9F389E2732CECA001DBA12 /* NavigationProvider.swift in Sources */,
 				DA5F450025F07DE200F573EC /* ElectronicHorizonOptions.swift in Sources */,
 				DAFA92071F01735000A7FB09 /* DistanceFormatter.swift in Sources */,
 				DAF27252264E02D800C0AC37 /* RoadObject.swift in Sources */,
