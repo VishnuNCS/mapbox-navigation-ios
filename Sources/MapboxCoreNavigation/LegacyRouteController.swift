@@ -20,7 +20,7 @@ open class LegacyRouteController: NSObject, Router, InternalRouter, CLLocationMa
     /**
      Routing provider used to create the route.
      */
-    public var routingProvider: NavigationProvider
+    public var routingProvider: RoutingProvider
 
     public var route: Route {
         routeProgress.route
@@ -131,7 +131,7 @@ open class LegacyRouteController: NSObject, Router, InternalRouter, CLLocationMa
                      routeOptions: RouteOptions?,
                      isProactive: Bool,
                      completion: ((Bool) -> Void)?) {
-        guard let route = indexedRouteResponse.selectedRoute else {
+        guard let route = indexedRouteResponse.currentRoute else {
             preconditionFailure("`indexedRouteResponse` does not contain route for index `\(indexedRouteResponse.routeIndex)` when updating route.")
         }
         let routeOptions = routeOptions ?? routeProgress.routeOptions
@@ -198,7 +198,7 @@ open class LegacyRouteController: NSObject, Router, InternalRouter, CLLocationMa
     required public init(alongRouteAtIndex routeIndex: Int,
                          in routeResponse: RouteResponse,
                          options: RouteOptions,
-                         routingProvider: NavigationProvider = Directions.shared,
+                         routingProvider: RoutingProvider = Directions.shared,
                          dataSource source: RouterDataSource) {
         self.routingProvider = routingProvider
         self.indexedRouteResponse = .init(routeResponse: routeResponse, routeIndex: routeIndex)

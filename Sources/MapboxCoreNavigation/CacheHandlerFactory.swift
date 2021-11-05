@@ -12,6 +12,12 @@ protocol CacheHandlerData {
 
 extension NativeHandlersFactory: CacheHandlerData { }
 
+/**
+ :nodoc:
+ Creates new or returns existing `CacheHandle`.
+ 
+ This factory is required since `CacheHandle` is used by multiple unrelated entities and is quite expensive to allocate. Since bindgen-generated `MBNNCacheFactory` is not an actual factory but just a wrapper around general init, `CacheHandlerFactory` introduces basic caching of the latest allocated entity. In most of the cases there should never be multiple cache handlers with different attributes, so such solution is adequate at the moment.
+ */
 enum CacheHandlerFactory {
     
     private struct CacheKey: CacheHandlerData {

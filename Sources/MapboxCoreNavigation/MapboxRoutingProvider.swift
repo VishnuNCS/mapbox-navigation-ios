@@ -5,52 +5,52 @@ import MapboxNavigationNative
 /**
  Provides alternative access to routing API.
  
- Use this class instead `Directions` requests wrapper to request new routes or refresh an existing one. Depending on `RouterSource`, `NavigationRouter` will use online and/or onboard routing engines. This may be used when designing purely online or offline apps, or when you need to provide best possible service regardless of internet collection.
+ Use this class instead `Directions` requests wrapper to request new routes or refresh an existing one. Depending on `RouterSource`, `MapboxRoutingProvider` will use online and/or onboard routing engines. This may be used when designing purely online or offline apps, or when you need to provide best possible service regardless of internet collection.
  */
-public class NavigationRouter: NavigationProvider {
+public class MapboxRoutingProvider: RoutingProvider {
     /**
      Unique identifier for a giver request.
      
-     Valid only for the same instance of `NavigationRouter` that issued it.
+     Valid only for the same instance of `MapboxRoutingProvider` that issued it.
      */
     public typealias RequestId = UInt64
     
     /**
      A request handler for the ongoing router action.
      
-     You can use this instance to cancel ongoing task if needed. Retaining this handler will keep related `NavigationRouter` from deallocating.
+     You can use this instance to cancel ongoing task if needed. Retaining this handler will keep related `MapboxRoutingProvider` from deallocating.
      */
-    public struct RoutingRequest: NavigationProviderRequest {
+    public struct Request: NavigationProviderRequest {
         /**
          Related request identifier.
          */
-        public let id: RequestId
+        public let requestIdentifier: RequestId
         
-        // Intended retain cycle to prevent deallocating. `RoutingRequest` will be deleted once request completes.
-        let router: NavigationRouter
+        // Intended retain cycle to prevent deallocating. `Request` will be deleted once request completes.
+        let router: MapboxRoutingProvider
         
         /**
          Cancels the request if it is still active.
          */
         public func cancel() {
-            router.router.cancelRequest(forToken: id)
+            router.router.cancelRequest(forToken: requestIdentifier)
         }
     }
     
     /**
      Defines source of routing engine to be used for requests.
      */
-    public enum RouterSource {
+    public enum Source {
         /**
          Fetch data online only
          
-         Such `NavigationRouter` is equivalent of using bare `Directions` wrapper.
+         Such `MapboxRoutingProvider` is equivalent of using bare `Directions` wrapper.
          */
         case online
         /**
          Use online data only
          
-         In order for such `NavigationRouter` to function properly, proper navigation data should be available onboard. `.offline` router will not be able to refresh routes.
+         In order for such `MapboxRoutingProvider` to function properly, proper navigation data should be available onboard. `.offline` router will not be able to refresh routes.
          */
         case offline
         /**
@@ -72,19 +72,19 @@ public class NavigationRouter: NavigationProvider {
         }
     }
     
-    static var __testRoutesStub: ((_: RouteOptions, _: @escaping Directions.RouteCompletionHandler) -> RoutingRequest?)? = nil
+    static var __testRoutesStub: ((_: RouteOptions, _: @escaping Directions.RouteCompletionHandler) -> Request?)? = nil
     
     // MARK: - Properties
     /**
      List of ongoing tasks for the router.
      
-     You can see if router is busy with somethin, or used related `RoutingRequest.cancel()` to cancel requests as needed.
+     You can see if router is busy with somethin, or used related `Request.cancel()` to cancel requests as needed.
      */
-    public private(set) var activeRequests: [RequestId : RoutingRequest] = [:]
+    public private(set) var activeRequests: [RequestId : Request] = [:]
     /**
      Configured routing engine source.
      */
-    public let source: RouterSource
+    public let source: Source
     
     private let requestsLock = NSLock()
     private let router: RouterInterface
@@ -93,12 +93,12 @@ public class NavigationRouter: NavigationProvider {
     //MARK: - Initialization
     
     /**
-     Initializes new `NavigationRouter`.
+     Initializes new `MapboxRoutingProvider`.
      
      - parameter source: routing engine source to use.
      - parameter settings: settings object, used to get credentials and cache configuration.
      */
-    public init(_ source: RouterSource = .hybrid, settings: NavigationSettings = .shared) {
+    public init(_ source: Source = .hybrid, settings: NavigationSettings = .shared) {
         self.source = source
         self.settings = settings
         
@@ -122,8 +122,8 @@ public class NavigationRouter: NavigationProvider {
      - parameter completionHandler: The closure (block) to call with the resulting routes. This closure is executed on the application’s main thread.
      - returns: Related request. If, while waiting for the completion handler to execute, you no longer want the resulting routes, cancel corresponding task using this handle or `activeRequests`.
      */
-    @discardableResult public func requestRoutes(options: RouteOptions,
-                                                 completionHandler: @escaping Directions.RouteCompletionHandler) -> NavigationProviderRequest? {
+    @discardableResult public func calculateRoutes(options: RouteOptions,
+                                                   completionHandler: @escaping Directions.RouteCompletionHandler) -> NavigationProviderRequest? {
         return Self.__testRoutesStub?(options, completionHandler) ??
             doRequest(options: options) { [weak self] (result: Result<RouteResponse, DirectionsError>) in
                 guard let self = self else { return }
@@ -142,8 +142,8 @@ public class NavigationRouter: NavigationProvider {
      - parameter completionHandler: The closure (block) to call with the resulting matches. This closure is executed on the application’s main thread.
      - returns: Related request. If, while waiting for the completion handler to execute, you no longer want the resulting routes, cancel corresponding task using this handle or `activeRequests`.
      */
-    @discardableResult public func requestRoutes(options: MatchOptions,
-                                                 completionHandler: @escaping Directions.MatchCompletionHandler) -> NavigationProviderRequest? {
+    @discardableResult public func calculateRoutes(options: MatchOptions,
+                                                   completionHandler: @escaping Directions.MatchCompletionHandler) -> NavigationProviderRequest? {
         return doRequest(options: options) { (result: Result<MapMatchingResponse, DirectionsError>) in
             let session = (options: options as DirectionsOptions,
                            credentials: self.settings.directions.credentials)
@@ -167,7 +167,7 @@ public class NavigationRouter: NavigationProvider {
                                                 fromLegAtIndex startLegIndex: UInt32 = 0,
                                                 completionHandler: @escaping Directions.RouteCompletionHandler) -> NavigationProviderRequest? {
         guard case let .route(routeOptions) = indexedRouteResponse.routeResponse.options else {
-            preconditionFailure("Invalid route data passed for refreshing.")
+            preconditionFailure("Invalid route data passed for refreshing. Expected `RouteResponse` containing `.route` `ResponseOptions` but got `.match`.")
         }
         
         let session = (options: routeOptions as DirectionsOptions,
@@ -207,7 +207,7 @@ public class NavigationRouter: NavigationProvider {
                 completionHandler(session, response)
             }
         }
-        activeRequests[requestId] = RoutingRequest(id: requestId,
+        activeRequests[requestId] = Request(requestIdentifier: requestId,
                                                    router: self)
         requestsLock.unlock()
         return activeRequests[requestId]
@@ -288,7 +288,7 @@ public class NavigationRouter: NavigationProvider {
     }
     
     fileprivate func doRequest<ResponseType: Codable>(options: DirectionsOptions,
-                                                      completion: @escaping (Result<ResponseType, DirectionsError>) -> Void) -> RoutingRequest? {
+                                                      completion: @escaping (Result<ResponseType, DirectionsError>) -> Void) -> Request? {
         let directionsUri = settings.directions.url(forCalculating: options).removingSKU().absoluteString
         var requestId: RequestId!
         requestsLock.lock()
@@ -301,7 +301,7 @@ public class NavigationRouter: NavigationProvider {
                                           result: result,
                                           completion: completion)
         }
-        activeRequests[requestId] = RoutingRequest(id: requestId,
+        activeRequests[requestId] = Request(requestIdentifier: requestId,
                                                    router: self)
         requestsLock.unlock()
         return activeRequests[requestId]

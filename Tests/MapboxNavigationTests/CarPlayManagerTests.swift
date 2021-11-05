@@ -253,7 +253,7 @@ class CarPlayManagerSpec: QuickSpec {
             }
             
             afterEach {
-                NavigationRouter.__testRoutesStub = nil
+                MapboxRoutingProvider.__testRoutesStub = nil
             }
 
             let previewRoutesAction = {
@@ -270,7 +270,7 @@ class CarPlayManagerSpec: QuickSpec {
                                                    waypoints: waypoints,
                                                    options: .route(options),
                                                    credentials: Fixture.credentials)
-                NavigationRouter.__testRoutesStub = { (options, completionHandler) in
+                MapboxRoutingProvider.__testRoutesStub = { (options, completionHandler) in
                     completionHandler(Directions.Session(options, Fixture.credentials),
                                       .success(fasterResponse))
                     return nil

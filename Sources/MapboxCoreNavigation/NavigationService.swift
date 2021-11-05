@@ -5,9 +5,9 @@ import MapboxDirections
 /**
  A navigation service coordinates various nonvisual components that track the user as they navigate along a predetermined route. You use `MapboxNavigationService`, which conforms to this protocol, either as part of `NavigationViewController` or by itself as part of a custom user interface. A navigation service calls methods on its `delegate`, which conforms to the `NavigationServiceDelegate` protocol, whenever significant events or decision points occur along the route.
  
- A navigation service controls a `NavigationLocationManager` for determining the user’s location, a `Router` that tracks the user’s progress along the route, a `NavigationRouter` service for calculating new routes (only used when rerouting), and a `NavigationEventsManager` for sending telemetry events related to navigation or user feedback.
+ A navigation service controls a `NavigationLocationManager` for determining the user’s location, a `Router` that tracks the user’s progress along the route, a `MapboxRoutingProvider` service for calculating new routes (only used when rerouting), and a `NavigationEventsManager` for sending telemetry events related to navigation or user feedback.
  
- `NavigationViewController` comes with a `MapboxNavigationService` by default. You may override it to customize the `NavigationRouter`'s source service or simulation mode. After creating the navigation service, pass it into `NavigationOptions(styles:navigationService:voiceController:topBanner:bottomBanner:)`, then pass that object into `NavigationViewController(for:options:)`.
+ `NavigationViewController` comes with a `MapboxNavigationService` by default. You may override it to customize the `MapboxRoutingProvider`'s source service or simulation mode. After creating the navigation service, pass it into `NavigationOptions(styles:navigationService:voiceController:topBanner:bottomBanner:)`, then pass that object into `NavigationViewController(for:options:)`.
  
  If you use a navigation service by itself, outside of `NavigationViewController`, call `start()` when the user is ready to begin navigating along the route.
  */
@@ -18,9 +18,9 @@ public protocol NavigationService: CLLocationManagerDelegate, RouterDataSource, 
     var locationManager: NavigationLocationManager { get }
     
     /**
-     `NavigationProvider`, used to create route.
+     `RoutingProvider`, used to create route.
      */
-    var routingProvider: NavigationProvider { get }
+    var routingProvider: RoutingProvider { get }
     
     /**
      Credentials data, used to authorize server requests.
@@ -284,7 +284,7 @@ public class MapboxNavigationService: NSObject, NavigationService {
      - parameter routeResponse: `RouteResponse` object, containing selection of routes to follow.
      - parameter routeIndex: The index of the route within the original `RouteResponse` object.
      - parameter routeOptions: The route options used to get the route.
-     - parameter routingProvider: `NavigationProvider`, used to create route.
+     - parameter routingProvider: `RoutingProvider`, used to create route.
      - parameter credentials: Credentials to authorize additional data requests throughout the route. If this argument is omitted, the shared value of `NavigationSettings.directions` will be used.
      - parameter locationSource: An optional override for the default `NaviationLocationManager`.
      - parameter eventsManagerType: An optional events manager type to use while tracking the route.
@@ -294,7 +294,7 @@ public class MapboxNavigationService: NSObject, NavigationService {
     required public init(routeResponse: RouteResponse,
                          routeIndex: Int,
                          routeOptions: RouteOptions,
-                         routingProvider: NavigationProvider = Directions.shared,
+                         routingProvider: RoutingProvider = Directions.shared,
                          credentials: DirectionsCredentials = NavigationSettings.shared.directions.credentials,
                          locationSource: NavigationLocationManager? = nil,
                          eventsManagerType: NavigationEventsManager.Type? = nil,
@@ -381,9 +381,9 @@ public class MapboxNavigationService: NSObject, NavigationService {
     private var simulatedLocationSource: SimulatedLocationManager?
     
     /**
-     `NavigationProvider`, used to create route.
+     `RoutingProvider`, used to create route.
      */
-    public var routingProvider: NavigationProvider
+    public var routingProvider: RoutingProvider
     
     /**
      Credentials data, used to authorize server requests.

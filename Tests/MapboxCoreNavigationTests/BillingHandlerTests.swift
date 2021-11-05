@@ -539,7 +539,7 @@ final class BillingHandlerUnitTests: TestCase {
         let routeController = RouteController(alongRouteAtIndex: 0,
                                               in: initialRouteResponse,
                                               options: NavigationRouteOptions(coordinates: initialRouteWaypoints),
-                                              routingProvider: NavigationRouter(.offline),
+                                              routingProvider: MapboxRoutingProvider(.offline),
                                               dataSource: dataSource)
 
         let routeUpdated = expectation(description: "Route updated")
@@ -606,7 +606,7 @@ final class BillingHandlerUnitTests: TestCase {
             let routeController = RouteController(alongRouteAtIndex: 0,
                                                   in: routeResponse,
                                                   options: navOptions,
-                                                  routingProvider: NavigationRouter(.offline),
+                                                  routingProvider: MapboxRoutingProvider(.offline),
                                                   dataSource: self)
 
             let routerDelegateSpy = RouterDelegateSpy()

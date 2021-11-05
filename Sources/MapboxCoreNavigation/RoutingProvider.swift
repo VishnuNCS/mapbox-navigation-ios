@@ -4,29 +4,29 @@ import MapboxDirections
 /**
  Protocol which defines a type which can be used for fetching or refreshing routes.
  
- SDK provides conformance to this protocol for `Directions` and `NavigationRouter`.
+ SDK provides conformance to this protocol for `Directions` and `MapboxRoutingProvider`.
  */
-public protocol NavigationProvider {
+public protocol RoutingProvider {
     
     /**
-     Routing request method.
+     Routing caluclation method.
      
      - parameter options: A `RouteOptions` object specifying the requirements for the resulting routes.
      - parameter completionHandler: The closure (block) to call with the resulting routes. This closure is executed on the application’s main thread.
      - returns: Related request. If, while waiting for the completion handler to execute, you no longer want the resulting routes, cancel corresponding task using this handle.
      */
-    @discardableResult func requestRoutes(options: RouteOptions,
-                                          completionHandler: @escaping Directions.RouteCompletionHandler) -> NavigationProviderRequest?
+    @discardableResult func calculateRoutes(options: RouteOptions,
+                                            completionHandler: @escaping Directions.RouteCompletionHandler) -> NavigationProviderRequest?
     
     /**
-     Map matching request method.
+     Map matching calculation method.
      
      - parameter options: A `MatchOptions` object specifying the requirements for the resulting matches.
      - parameter completionHandler: The closure (block) to call with the resulting matches. This closure is executed on the application’s main thread.
      - returns: Related request. If, while waiting for the completion handler to execute, you no longer want the resulting routes, cancel corresponding task using this handle.
      */
-    @discardableResult func requestRoutes(options: MatchOptions,
-                                          completionHandler: @escaping Directions.MatchCompletionHandler) -> NavigationProviderRequest?
+    @discardableResult func calculateRoutes(options: MatchOptions,
+                                            completionHandler: @escaping Directions.MatchCompletionHandler) -> NavigationProviderRequest?
     
     /**
      Route refreshing method.
@@ -42,15 +42,15 @@ public protocol NavigationProvider {
 }
 
 /**
- `NavigationProvider` request type.
+ `RoutingProvider` request type.
  */
 public protocol NavigationProviderRequest {
     /**
      Request identifier.
      
-     Unique within related `NavigationProvider`.
+     Unique within related `RoutingProvider`.
      */
-    var id: UInt64 { get }
+    var requestIdentifier: UInt64 { get }
     
     /**
      Cancels ongoing request if it didn't finish yet.

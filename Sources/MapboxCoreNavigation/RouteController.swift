@@ -48,9 +48,9 @@ open class RouteController: NSObject {
     public unowned var dataSource: RouterDataSource
     
     /**
-     `NavigationProvider`, used to create route.
+     `RoutingProvider`, used to create route.
      */
-    public var routingProvider: NavigationProvider
+    public var routingProvider: RoutingProvider
     
     public var route: Route {
         return routeProgress.route
@@ -523,7 +523,7 @@ open class RouteController: NSObject {
     required public init(alongRouteAtIndex routeIndex: Int,
                          in routeResponse: RouteResponse,
                          options: RouteOptions,
-                         routingProvider: NavigationProvider,
+                         routingProvider: RoutingProvider,
                          dataSource source: RouterDataSource) {
         self.routingProvider = routingProvider
         self.indexedRouteResponse = .init(routeResponse: routeResponse, routeIndex: routeIndex)
@@ -683,7 +683,7 @@ extension RouteController: Router {
                      routeOptions: RouteOptions?,
                      isProactive: Bool,
                      completion: ((Bool) -> Void)?) {
-        guard let route = indexedRouteResponse.selectedRoute else {
+        guard let route = indexedRouteResponse.currentRoute else {
             preconditionFailure("`indexedRouteResponse` does not contain route for index `\(indexedRouteResponse.routeIndex)` when updating route.")
         }
         if shouldStartNewBillingSession(for: route, routeOptions: routeOptions) {

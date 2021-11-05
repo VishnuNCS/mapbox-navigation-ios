@@ -27,7 +27,7 @@ class NavigationServiceTests: TestCase {
         let navigationService = MapboxNavigationService(routeResponse: initialRouteResponse,
                                                         routeIndex: 0,
                                                         routeOptions: routeOptions,
-                                                        routingProvider: NavigationRouter(.offline),
+                                                        routingProvider: MapboxRoutingProvider(.offline),
                                                         locationSource: locationSource,
                                                         eventsManagerType: NavigationEventsManagerSpy.self,
                                                         simulating: .never)
@@ -64,7 +64,7 @@ class NavigationServiceTests: TestCase {
     override func tearDown() {
         super.tearDown()
         dependencies = nil
-        NavigationRouter.__testRoutesStub = nil
+        MapboxRoutingProvider.__testRoutesStub = nil
     }
 
     func testDefaultUserInterfaceUsage() {
@@ -474,7 +474,7 @@ class NavigationServiceTests: TestCase {
         }
 
         // MARK: Setupping a re-route stub
-        NavigationRouter.__testRoutesStub = { (options, completionHandler) in
+        MapboxRoutingProvider.__testRoutesStub = { (options, completionHandler) in
             completionHandler(Directions.Session(options, DirectionsCredentials()),
                               .success(RouteResponse(httpResponse: nil,
                                                      identifier: nil,
@@ -610,7 +610,7 @@ class NavigationServiceTests: TestCase {
 
         autoreleasepool {
             let fakeDataSource = RouteControllerDataSourceFake()
-            let routeController = RouteController(alongRouteAtIndex: 0, in: initialRouteResponse, options: routeOptions, routingProvider: NavigationRouter(.offline), dataSource: fakeDataSource)
+            let routeController = RouteController(alongRouteAtIndex: 0, in: initialRouteResponse, options: routeOptions, routingProvider: MapboxRoutingProvider(.offline), dataSource: fakeDataSource)
             subject = routeController
         }
 
@@ -622,7 +622,7 @@ class NavigationServiceTests: TestCase {
 
         autoreleasepool {
             let fakeDataSource = RouteControllerDataSourceFake()
-            _ = RouteController(alongRouteAtIndex: 0, in: initialRouteResponse, options: routeOptions, routingProvider: NavigationRouter(.offline), dataSource: fakeDataSource)
+            _ = RouteController(alongRouteAtIndex: 0, in: initialRouteResponse, options: routeOptions, routingProvider: MapboxRoutingProvider(.offline), dataSource: fakeDataSource)
             subject = fakeDataSource
         }
 
@@ -630,7 +630,7 @@ class NavigationServiceTests: TestCase {
     }
 
     func testCountdownTimerDefaultAndUpdate() {
-        let subject = MapboxNavigationService(routeResponse: initialRouteResponse, routeIndex: 0, routeOptions: routeOptions, routingProvider: NavigationRouter(.offline))
+        let subject = MapboxNavigationService(routeResponse: initialRouteResponse, routeIndex: 0, routeOptions: routeOptions, routingProvider: MapboxRoutingProvider(.offline))
 
         XCTAssert(subject.poorGPSTimer.countdownInterval == .milliseconds(2500), "Default countdown interval should be 2500 milliseconds.")
 
@@ -709,7 +709,7 @@ class NavigationServiceTests: TestCase {
         let service = MapboxNavigationService(routeResponse: routeResponse,
                                               routeIndex: 0,
                                               routeOptions: options,
-                                              routingProvider: NavigationRouter(.offline),
+                                              routingProvider: MapboxRoutingProvider(.offline),
                                               locationSource: locationManager)
         service.delegate = delegate
         let router = service.router
@@ -733,7 +733,7 @@ class NavigationServiceTests: TestCase {
                                            waypoints: waypointsForFasterRoute,
                                            options: .route(options),
                                            credentials: Fixture.credentials)
-        NavigationRouter.__testRoutesStub = { (options, completionHandler) in
+        MapboxRoutingProvider.__testRoutesStub = { (options, completionHandler) in
             completionHandler(Directions.Session(options, Fixture.credentials),
                               .success(fasterResponse))
             return nil

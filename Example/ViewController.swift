@@ -513,7 +513,7 @@ class ViewController: UIViewController {
     }
 
     func requestRoute(with options: RouteOptions, success: @escaping RouteRequestSuccess, failure: RouteRequestFailure?) {
-        NavigationRouter().requestRoutes(options: options) { (session, result) in
+        MapboxRoutingProvider().calculateRoutes(options: options) { (session, result) in
             switch result {
             case let .success(response):
                 success(response)
@@ -564,7 +564,7 @@ class ViewController: UIViewController {
         return MapboxNavigationService(routeResponse: response,
                                        routeIndex: routeIndex,
                                        routeOptions: options,
-                                       routingProvider: NavigationRouter(.hybrid),
+                                       routingProvider: MapboxRoutingProvider(.hybrid),
                                        simulating: mode)
     }
     

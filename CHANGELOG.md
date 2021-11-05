@@ -61,7 +61,7 @@
 
 ### Other changes
 
-* Introduced `NavigationProvider` to parameterize routing fetching and refreshing during active guidance sessions.  `Directions.calculateWithCache(options:completionHandler:)` and `Directions.calculateOffline(options:completionHandler)` functionality is replaced by `NavigationRouter`. It is now recommended to use `NavigationRouter` to request or refresh routes instead of `Directions` object but you may also provide your own `NavigationProvider` implementation to `NavigationService`, `RouteController` or `LegacyRouteController`.  ([#3261](https://github.com/mapbox/mapbox-navigation-ios/pull/3261))
+* Introduced `RoutingProvider` to parameterize routing fetching and refreshing during active guidance sessions.  `Directions.calculateWithCache(options:completionHandler:)` and `Directions.calculateOffline(options:completionHandler)` functionality is replaced by `MapboxRoutingProvider`. It is now recommended to use `MapboxRoutingProvider` to request or refresh routes instead of `Directions` object but you may also provide your own `RoutingProvider` implementation to `NavigationService`, `RouteController` or `LegacyRouteController`.  ([#3261](https://github.com/mapbox/mapbox-navigation-ios/pull/3261))
 
 ## v2.0.1
 

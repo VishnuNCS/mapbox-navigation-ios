@@ -515,7 +515,7 @@ extension CarPlayManager {
     }
     
     func calculate(_ options: RouteOptions, completionHandler: @escaping Directions.RouteCompletionHandler) {
-        NavigationRouter().requestRoutes(options: options, completionHandler: completionHandler)
+        MapboxRoutingProvider().calculateRoutes(options: options, completionHandler: completionHandler)
     }
     
     func didCalculate(_ result: Result<RouteResponse, DirectionsError>,
