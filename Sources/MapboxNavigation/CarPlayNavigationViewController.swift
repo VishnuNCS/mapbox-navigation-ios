@@ -68,10 +68,19 @@ open class CarPlayNavigationViewController: UIViewController {
      */
     public private(set) var styleManager: StyleManager?
     
+    /**
+     Allows to control highlighting of the destination building on arrival. By default destination buildings will not be highlighted.
+     */
+    public var waypointStyle: WaypointStyle = .annotation
+    
     var mapTemplate: CPMapTemplate
     var carInterfaceController: CPInterfaceController
     
     private var isTraversingTunnel = false
+    private var approachingDestinationThreshold: CLLocationDistance = 250.0
+    private var passedApproachingDestinationThreshold: Bool = false
+    private var currentLeg: RouteLeg?
+    private var foundAllBuildings = false
     
     func setupOrnaments() {
         let compassView = CarPlayCompassView()
@@ -481,6 +490,8 @@ open class CarPlayNavigationViewController: UIViewController {
         // Check to see if we're in a tunnel.
         checkTunnelState(at: location, along: routeProgress)
         
+        attemptToHighlightBuildings(routeProgress)
+        
         let legIndex = routeProgress.legIndex
         
         // Update the user puck
@@ -539,6 +550,33 @@ open class CarPlayNavigationViewController: UIViewController {
         if isTraversingTunnel, !inTunnel {
             isTraversingTunnel = false
             styleManager?.timeOfDayChanged()
+        }
+    }
+    
+    private func attemptToHighlightBuildings(_ progress: RouteProgress) {
+        // In case if distance was fully covered - do nothing.
+        // FIXME: This check prevents issue which leads to highlighting random buildings after arrival to final destination.
+        // At the same time this check will prevent building highlighting in case of arrival in overview mode/high altitude.
+        if progress.fractionTraveled >= 1.0 { return }
+        if waypointStyle == .annotation { return }
+
+        if currentLeg != progress.currentLeg {
+            currentLeg = progress.currentLeg
+            passedApproachingDestinationThreshold = false
+            foundAllBuildings = false
+        }
+        
+        if !passedApproachingDestinationThreshold, progress.currentLegProgress.distanceRemaining < approachingDestinationThreshold {
+            passedApproachingDestinationThreshold = true
+        }
+        
+        if !foundAllBuildings, passedApproachingDestinationThreshold,
+           let currentLegWaypoint = progress.currentLeg.destination?.targetCoordinate {
+            navigationMapView?.highlightBuildings(at: [currentLegWaypoint],
+                                                  in3D: waypointStyle == .extrudedBuilding ? true : false,
+                                                  completion: { (found) in
+                                                    self.foundAllBuildings = found
+                                                  })
         }
     }
     
