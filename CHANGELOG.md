@@ -26,8 +26,7 @@
 
 * Added the `CarPlayActivity.panningInNavigationMode` case, which allows to track a state when user is panning a map view while actively navigating. ([#3545](https://github.com/mapbox/mapbox-navigation-ios/pull/3545))
 * Fixed an issue that caused the panning dismissal button to stop working on CarPlay. ([#3543](https://github.com/mapbox/mapbox-navigation-ios/pull/3543))
-* Added the `CarPlayNavigationViewControllerDelegate.carPlayNavigationViewController(_:didSet:)` and `CarPlayManager.carPlayManager(_:didSet:)` delegate methods, which will be called whenever the `MapTemplate` updates the estimated distance remaining using a custom rounding mechanism.
-* Renamed `CarPlayManager.mapTemplate(_:selectedPreviewFor:using:)` to `CarPlayManager.mapTemplate(_:selectedPreviewFor:using:customRounding:)`.
+* Added the `CarPlayNavigationViewControllerDelegate.carPlayNavigationViewController(_:didUpdate:)` and `CarPlayManagerDelegate.carPlayManager(_:didUpdate:)` delegate methods, which will be called whenever the `MapTemplate` updates the estimated distance remaining using a custom rounding mechanism.([#3581](https://github.com/mapbox/mapbox-navigation-ios/pull/3581))
 
 ### Other changes
 
