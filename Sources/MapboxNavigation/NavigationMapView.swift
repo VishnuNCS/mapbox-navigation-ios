@@ -1209,6 +1209,7 @@ open class NavigationMapView: UIView {
     var routeRemainingDistancesIndex: Int?
     var fractionTraveled: Double = 0.0
     var currentLegIndex: Int?
+    var offRouteDistanceCheckDisabled: Bool = false
     
     /**
      `MapView`, which is added on top of `NavigationMapView` and allows to render navigation related components.

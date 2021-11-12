@@ -79,7 +79,9 @@ extension NavigationMapView {
             
             if routeLineTracksTraversal {
                 navigationMapView.updateUpcomingRoutePointIndex(routeProgress: router.routeProgress)
+                navigationMapView.offRouteDistanceCheckDisabled = true
                 navigationMapView.travelAlongRouteLine(to: location?.coordinate)
+                navigationMapView.offRouteDistanceCheckDisabled = false
             }
         }
         
@@ -157,7 +159,9 @@ extension NavigationMapView {
             navigationMapView.show([routeProgress.route], legIndex: routeProgress.legIndex)
             if routeLineTracksTraversal {
                 navigationMapView.updateUpcomingRoutePointIndex(routeProgress: routeProgress)
+                navigationMapView.offRouteDistanceCheckDisabled = true
                 navigationMapView.travelAlongRouteLine(to: router.location?.coordinate)
+                navigationMapView.offRouteDistanceCheckDisabled = false
             }
         }
     }

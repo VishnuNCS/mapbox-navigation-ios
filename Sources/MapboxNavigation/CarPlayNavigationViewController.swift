@@ -587,7 +587,9 @@ open class CarPlayNavigationViewController: UIViewController {
         navigationMapView?.show([progress.route], legIndex: legIndex)
         if routeLineTracksTraversal {
             navigationMapView?.updateUpcomingRoutePointIndex(routeProgress: progress)
+            navigationMapView?.offRouteDistanceCheckDisabled = true
             navigationMapView?.travelAlongRouteLine(to: coordinate)
+            navigationMapView?.offRouteDistanceCheckDisabled = false
         }
     }
     

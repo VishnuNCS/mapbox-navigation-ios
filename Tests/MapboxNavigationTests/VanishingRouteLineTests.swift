@@ -292,4 +292,29 @@ class VanishingRouteLineTests: TestCase {
         let currentLineGradientStops = navigationMapView.routeLineGradient(congestionFeatures, fractionTraveled: 0.0)
         XCTAssertEqual(currentLineGradientStops[0.0], navigationMapView.trafficUnknownColor, "Failed to use trafficUnknownColor for route line when no congestion level found.")
     }
+    func testFindDistanceToNearestPointOnCurrentLine() {
+        let route = getMultilegRoute()
+        let coordinate = route.shape!.coordinates[15]
+        let granularDistances = navigationMapView.calculateGranularDistances(route.shape!.coordinates)!
+        let expectedResult = 141.6772603078415
+        let result = navigationMapView.findDistanceToNearestPointOnCurrentLine(coordinate: coordinate, granularDistances: granularDistances, upcomingIndex: 12)
+        XCTAssertEqual(expectedResult, result, accuracy: 0.01, "Failed to calculate the distance from one coordinate to current route line.")
+    }
+    
+    func testUpdateFractionTraveledWhenUserOffRouteLine() {
+        let route = getRoute()
+        let routeProgress = getRouteProgress()
+        let coordinate = CLLocationCoordinate2D(latitude: 37.7577627, longitude: -122.4727051)
+        
+        navigationMapView.routes = [route]
+        navigationMapView.routeLineTracksTraversal = true
+        navigationMapView.show([route], legIndex: 0)
+        navigationMapView.updateUpcomingRoutePointIndex(routeProgress: routeProgress)
+        setUpCameraZoom(at: 16.0)
+        
+        let expectedFractionTraveled = 0.0
+        navigationMapView.updateFractionTraveled(coordinate: coordinate)
+        XCTAssertTrue(expectedFractionTraveled == navigationMapView.fractionTraveled, "Failed to stop updating fractionTraveled when user off the route line.")
+    }
+    
 }
