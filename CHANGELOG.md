@@ -22,6 +22,7 @@
 * Fixed an issue where `ReplayLocationManager` didn't update location timestamps when a new loop started. ([#3550](https://github.com/mapbox/mapbox-navigation-ios/pull/3550))
 * Fixed the background location update issue during active navigation when using default `.courseView` for `NavigationMapView.userLocationStyle`. ([#3533](https://github.com/mapbox/mapbox-navigation-ios/pull/3533))
 * Fixed an issue where `UserPuckCourseView` is trimmed when using custom frame for `UserLocationStyle.courseView(_:)`. ([#3601](https://github.com/mapbox/mapbox-navigation-ios/pull/3601))
+* Fixed an issue when user goes offline and the route line grows back when `NavigationViewController.routeLineTracksTraversal` was enabled. Added global variable `OffRouteDistanceUpdateThreshold` as the distance threshold. When the distance of user location to the route is larger than the `OffRouteDistanceUpdateThreshold`, the vanishing effect of route line would stop untile the new route line generated. ([#3385](https://github.com/mapbox/mapbox-navigation-ios/pull/3385))
 
 ### Banners and guidance instructions
 
