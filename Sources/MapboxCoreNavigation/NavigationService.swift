@@ -25,7 +25,7 @@ public protocol NavigationService: CLLocationManagerDelegate, RouterDataSource, 
     /**
      Credentials data, used to authorize server requests.
      */
-    var credentials: DirectionsCredentials { get }
+    var credentials: Credentials { get }
     
     /**
      The router object that tracks the user’s progress as they travel along a predetermined route.
@@ -295,7 +295,7 @@ public class MapboxNavigationService: NSObject, NavigationService {
                          routeIndex: Int,
                          routeOptions: RouteOptions,
                          routingProvider: RoutingProvider = Directions.shared,
-                         credentials: DirectionsCredentials = NavigationSettings.shared.directions.credentials,
+                         credentials: Credentials = NavigationSettings.shared.directions.credentials,
                          locationSource: NavigationLocationManager? = nil,
                          eventsManagerType: NavigationEventsManager.Type? = nil,
                          simulating simulationMode: SimulationMode? = nil,
@@ -388,7 +388,7 @@ public class MapboxNavigationService: NSObject, NavigationService {
     /**
      Credentials data, used to authorize server requests.
      */
-    public var credentials: DirectionsCredentials
+    public var credentials: Credentials
 
     
     // MARK: Managing Route-Related Data

@@ -3,7 +3,7 @@ import MapboxNavigationNative
 
 protocol CacheHandlerData {
     var tileStorePath: String { get }
-    var credentials: DirectionsCredentials { get }
+    var credentials: Credentials { get }
     var tilesVersion: String { get }
     var historyDirectoryURL: URL? { get }
     var targetVersion: String? { get }
@@ -22,7 +22,7 @@ enum CacheHandlerFactory {
     
     private struct CacheKey: CacheHandlerData {
         let tileStorePath: String
-        let credentials: DirectionsCredentials
+        let credentials: Credentials
         let tilesVersion: String
         let historyDirectoryURL: URL?
         let targetVersion: String?

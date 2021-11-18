@@ -33,6 +33,7 @@ class RouteControllerTests: TestCase {
         locationManager.delegate = routeController
         let routerDelegateSpy = RouterDelegateSpy()
         routeController.delegate = routerDelegateSpy
+        routeController.reroutesProactively = false
 
         var actualCoordinates = [CLLocationCoordinate2D]()
         routerDelegateSpy.onShouldDiscard = { location in

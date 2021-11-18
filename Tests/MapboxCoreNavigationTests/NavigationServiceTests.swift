@@ -475,7 +475,7 @@ class NavigationServiceTests: TestCase {
 
         // MARK: Setupping a re-route stub
         MapboxRoutingProvider.__testRoutesStub = { (options, completionHandler) in
-            completionHandler(Directions.Session(options, DirectionsCredentials()),
+            completionHandler(Directions.Session(options, Credentials()),
                               .success(RouteResponse(httpResponse: nil,
                                                      identifier: nil,
                                                      routes: [self.alternateRoute],
@@ -749,19 +749,9 @@ class NavigationServiceTests: TestCase {
 
         service.start()
 
-        wait(for: [rerouteTriggeredExpectation], timeout: locationManager.expectedReplayTime)
+        wait(for: [rerouteTriggeredExpectation, didRerouteExpectation], timeout: locationManager.expectedReplayTime)
         locationManager.stopUpdatingLocation()
-
-        let fasterRouteName = "DCA-Arboretum-dummy-faster-route"
-        let fasterOptions = NavigationRouteOptions(coordinates: [
-            CLLocationCoordinate2D(latitude: 38.878206, longitude: -77.037265),
-            CLLocationCoordinate2D(latitude: 38.910736, longitude: -76.966906),
-        ])
-        let fasterRoute = Fixture.route(from: fasterRouteName, options: fasterOptions)
-        let waypointsForFasterRoute = Fixture.waypoints(from: fasterRouteName, options: fasterOptions)
-        directions.fireLastCalculateCompletion(with: waypointsForFasterRoute, routes: [fasterRoute], error: nil)
         
-        wait(for: [didRerouteExpectation], timeout: 10)
         XCTAssertTrue(delegate.recentMessages.contains("navigationService(_:didRerouteAlong:at:proactive:)"))
     }
 

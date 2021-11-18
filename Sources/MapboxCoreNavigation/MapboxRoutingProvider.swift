@@ -1,6 +1,7 @@
 @_implementationOnly import MapboxCommon_Private
 import MapboxDirections
 import MapboxNavigationNative
+@_implementationOnly import MapboxNavigationNative_Private
 
 /**
  Provides alternative access to routing API.
@@ -87,7 +88,7 @@ public class MapboxRoutingProvider: RoutingProvider {
     public let source: Source
     
     private let requestsLock = NSLock()
-    private let router: RouterInterface
+    private let router: MapboxNavigationNative_Private.RouterInterface
     private let settings: NavigationSettings
     
     //MARK: - Initialization
@@ -104,9 +105,9 @@ public class MapboxRoutingProvider: RoutingProvider {
         
         let factory = NativeHandlersFactory(tileStorePath: settings.tileStoreConfiguration.navigatorLocation.tileStoreURL?.path ?? "",
                                             credentials: settings.directions.credentials)
-        self.router = MapboxNavigationNative.RouterFactory.build(for: source.nativeSource,
-                                                                 cache: factory.cacheHandle,
-                                                                 historyRecorder: factory.historyRecorder)
+        self.router = RouterFactory.build(for: source.nativeSource,
+                                          cache: factory.cacheHandle,
+                                          historyRecorder: factory.historyRecorder)
     }
     
     // MARK: - Public methods
@@ -308,7 +309,7 @@ public class MapboxRoutingProvider: RoutingProvider {
     }
 }
 
-extension DirectionsProfileIdentifier {
+extension ProfileIdentifier {
     var nativeProfile: RoutingProfile {
         var mode: RoutingMode
         switch self {
