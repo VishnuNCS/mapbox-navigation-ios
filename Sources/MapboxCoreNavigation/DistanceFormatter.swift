@@ -30,6 +30,8 @@ struct RoundingTable {
         .init(maximumDistance: Measurement(value: 100, unit: .meters), roundingIncrement: 25, maximumFractionDigits: 0),
         .init(maximumDistance: Measurement(value: 999, unit: .meters), roundingIncrement: 50, maximumFractionDigits: 0),
         // The rounding increment is a small value rather than 0 because of floating-point imprecision that causes 0.5 to round down.
+        .init(maximumDistance: Measurement(value: 999, unit: .meters), roundingIncrement: 1, maximumFractionDigits: 1),
+        .init(maximumDistance: Measurement(value: 999, unit: .kilometers), roundingIncrement: 0.0001, maximumFractionDigits: 1),
         .init(maximumDistance: Measurement(value: 3, unit: .kilometers), roundingIncrement: 0.0001, maximumFractionDigits: 1),
         .init(maximumDistance: Measurement(value: 5, unit: .kilometers), roundingIncrement: 0.0001, maximumFractionDigits: 0)
     ])
