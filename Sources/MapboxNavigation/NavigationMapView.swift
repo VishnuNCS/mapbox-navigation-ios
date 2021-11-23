@@ -122,7 +122,7 @@ open class NavigationMapView: UIView {
         showWaypoints(on: activeRoute)
         
         navigationCamera.stop()
-        fitCamera(to: activeRoute, animated: animated)
+        fitCamera(to: routes, animated: animated)
     }
     
     /**
@@ -518,6 +518,12 @@ open class NavigationMapView: UIView {
             setupUserLocation()
         }
     }
+
+    var inActiveNavigation: Bool = false {
+        didSet {
+            setupUserLocation()
+        }
+    }
     
     /**
      Most recent user location, which is used to place `UserCourseView`.
@@ -549,7 +555,7 @@ open class NavigationMapView: UIView {
         } else {
             switch userLocationStyle {
             case .courseView(let courseView):
-                mapView.location.options.puckType = .puck2D(emptyPuckConfiguration)
+                mapView.location.options.puckType = inActiveNavigation ? nil : .puck2D(emptyPuckConfiguration)
                 
                 courseView.tag = NavigationMapView.userCourseViewTag
                 mapView.addSubview(courseView)
@@ -1532,10 +1538,14 @@ open class NavigationMapView: UIView {
         mapView.preferredFramesPerSecond = NavigationMapView.FrameIntervalOptions.defaultFramesPerSecond
     }
     
-    func fitCamera(to route: Route, animated: Bool = false) {
-        guard let routeShape = route.shape, !routeShape.coordinates.isEmpty else { return }
+    func fitCamera(to routes: [Route], animated: Bool = false) {
+        for route in routes {
+            guard let routeShape = route.shape, !routeShape.coordinates.isEmpty else { return }
+        }
+
+        let multiLineString = MultiLineString(routes.map({route in route.shape!.coordinates}))
         let edgeInsets = safeArea + UIEdgeInsets.centerEdgeInsets
-        if let cameraOptions = mapView?.mapboxMap.camera(for: .lineString(routeShape),
+        if let cameraOptions = mapView?.mapboxMap.camera(for: .multiLineString(multiLineString),
                                                          padding: edgeInsets,
                                                          bearing: nil,
                                                          pitch: nil) {
