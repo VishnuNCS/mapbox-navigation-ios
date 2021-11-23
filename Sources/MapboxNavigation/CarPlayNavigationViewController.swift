@@ -70,7 +70,7 @@ open class CarPlayNavigationViewController: UIViewController {
         let compassView = CarPlayCompassView()
         view.addSubview(compassView)
         compassView.topAnchor.constraint(equalTo: view.safeTopAnchor, constant: 8).isActive = true
-        compassView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -8).isActive = true
+        compassView.trailingAnchor.constraint(equalTo: view.safeTrailingAnchor, constant: -8).isActive = true
         self.compassView = compassView
         
         let speedLimitView = SpeedLimitView()
@@ -78,7 +78,7 @@ open class CarPlayNavigationViewController: UIViewController {
         view.addSubview(speedLimitView)
         
         speedLimitView.topAnchor.constraint(equalTo: compassView.bottomAnchor, constant: 8).isActive = true
-        speedLimitView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -8).isActive = true
+        speedLimitView.trailingAnchor.constraint(equalTo: view.safeTrailingAnchor, constant: -8).isActive = true
         speedLimitView.widthAnchor.constraint(equalToConstant: 30).isActive = true
         speedLimitView.heightAnchor.constraint(equalToConstant: 30).isActive = true
         
@@ -350,6 +350,7 @@ open class CarPlayNavigationViewController: UIViewController {
         navigationService.start()
         carPlayManager.delegate?.carPlayManager(carPlayManager, didBeginNavigationWith: navigationService)
         currentLegIndexMapped = navigationService.router.routeProgress.legIndex
+        navigationMapView?.inActiveNavigation = true
         navigationMapView?.simulatesLocation = navigationService.locationManager.simulatesLocation
         
         updateTripEstimateStyle(traitCollection.userInterfaceStyle)
